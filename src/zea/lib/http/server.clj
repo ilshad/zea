@@ -38,8 +38,9 @@
     zea/ILifecycle
     (start [c]
       (let [conf (zea/config c app)
-            handler (zea/component (:handler conf) app)]
-        (assoc c :stop (run-server (zea/handler handler) conf))))
+            handler (zea/component (:handler conf) app)
+            stop (run-server (zea/handler handler) conf)]
+        (assoc c :stop stop)))
 
     (stop [c]
       ((:stop c) :timeout 100)

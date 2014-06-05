@@ -3,7 +3,7 @@
 (defprotocol IConfig
   (setup [c]
     "Return map - config with default values.
-     Used to install configuration schema for this  component."))
+     Used to install configuration schema for this component."))
 
 (defprotocol ILifecycle
   (start [c]
@@ -21,7 +21,9 @@
 
 (defprotocol IRoute
   (route [c request]
-    "Look at request data and return app path to some component."))
+    "Look at request data and return map with keys:
+     * :path - app path to some component,
+     * :params - route params, map."))
 
 (defprotocol IResponse
   (response [c request]
