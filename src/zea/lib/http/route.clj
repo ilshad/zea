@@ -21,24 +21,23 @@
   (reify
 
     zea/IConfig
-    (config [_]
+    (setup [_]
       {:route-map {[:http :root] "/"
                    [:http :not-found] "*"}})
 
     zea/ILifecycle
-    (start [this]
-      (assoc this
-        :route-map (map (fn [[a b]] [(lexer a) b])
-                        (:route-map (zea/config this)))))
+    (start [c]
+      (assoc c :route-map (map (fn [[a b]] [(lexer a) b])
+                               (:route-map (zea/config c app)))))
 
-    (stop [this]
-      (dissoc this :route-map))
+    (stop [c]
+      (dissoc c :route-map))
     
     zea/IRoute
-    (route [this request]
+    (route [c request]
       nil)
 
     zea/IHandler
-    (handler [this]
+    (handler [c]
       (fn [request]
-        (zea/component app (zea/route this request))))))
+        (zea/component (zea/route c request) app)))))

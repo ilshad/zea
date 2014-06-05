@@ -16,23 +16,24 @@
   (reify
 
     zea/IConfig
-    (config [_]
+    (setup [_]
       {:uri "datomic:mem://example"
        :schema "schema.edn"})
 
     zea/ILifecycle
-    (start [this]
-      (let [file (-> this zea/config :schema)
-            uri (-> this zea/config :uri)
+    (start [c]
+      (let [conf (zea/config c app)
+            file (:schema conf)
+            uri (:uri conf)
             created (d/create-database uri)
             conn (d/connect uri)]
         (when created
           @(d/transact conn (-> app :resources file io/resource slurp read-string)))
-        (assoc this :conn conn)))
+        (assoc c :conn conn)))
 
-    (stop [this]
-      (d/release (:conn this))
-      (dissoc this :conn))))
+    (stop [c]
+      (d/release (:conn c))
+      (dissoc c :conn))))
 
 
 

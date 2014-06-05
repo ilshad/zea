@@ -25,7 +25,7 @@
   (reify
 
     zea/IConfig
-    (config [_]
+    (setup [_]
       {:ip "0.0.0.0"
        :port 8090
        :thread 4
@@ -36,10 +36,11 @@
        :handler [:route]})
 
     zea/ILifecycle
-    (start [this]
-      (let [handler (zea/component app (-> this zea/config :handler))]
-        (assoc this :stop (run-server (zea/handler handler) (zea/config this)))))
+    (start [c]
+      (let [conf (zea/config c app)
+            handler (zea/component (:handler conf) app)]
+        (assoc c :stop (run-server (zea/handler handler) conf))))
 
-    (stop [this]
-      ((:stop this) :timeout 100)
-      (dissoc this :stop))))
+    (stop [c]
+      ((:stop c) :timeout 100)
+      (dissoc c :stop))))

@@ -1,31 +1,38 @@
 (ns zea.core)
 
 (defprotocol IConfig
-  (config [this]
-    "Return map - config with default values."))
+  (setup [c]
+    "Return map - config with default values.
+     Used to install configuration schema for this  component."))
 
 (defprotocol ILifecycle
-  (start [this]
-    "Start component and return its updated version.")
-  (stop [this]
-    "Shut down component and return its updated version."))
-
-(defprotocol IResponse
-  (response [this request]
-    "Take Ring request, return Ring response."))
+  (start [c]
+    "Start this component and return its updated version.")
+  (stop [c]
+    "Shut down this component and return its updated version."))
 
 (defprotocol ITraversable
-  (path [this]
-    "Returns full path to this component within the application."))
-
-(defprotocol IRoute
-  (route [this request]
-    "Look at request data and return path to some component."))
+  (path [c]
+    "Return full app path to this component."))
 
 (defprotocol IHandler
-  (handler [this]
+  (handler [c]
     "Return Ring handler function."))
+
+(defprotocol IRoute
+  (route [c request]
+    "Look at request data and return app path to some component."))
+
+(defprotocol IResponse
+  (response [c request]
+    "Take Ring request, return Ring response."))
+
+(defn config 
+  "Return actual config for this component."
+  [c app]
+  (get (:config app) (last (path c))))
 
 (defn component
   "Return actual component."
-  [app path])
+  [path app]
+  nil)
