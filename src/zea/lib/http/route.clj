@@ -28,10 +28,9 @@
 
     zea/ILifecycle
     (start [this]
-      (let [key (zea/key this)]
-        (assoc this
-          :route-map (map (fn [[a b]] [a (lexer b)])
-                          (-> app :config key :route-map)))))
+      (assoc this
+        :route-map (map (fn [[a b]] [a (lexer b)])
+                        (:route-map (zea/config this)))))
 
     (stop [this]
       (dissoc this :route-map))

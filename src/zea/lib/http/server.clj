@@ -37,11 +37,8 @@
 
     zea/ILifecycle
     (start [this]
-      (let [key (zea/key this)
-            config (-> app :config key)
-            route (zea/component app (:route-path config))
-            stop (run-server (zea/handler route) config)]
-        (assoc this :stop stop)))
+      (let [route (zea/component app (-> this zea/config :route-path))]
+        (assoc this :stop (run-server (zea/handler route) (zea/config this)))))
 
     (stop [this]
       ((:stop this) :timeout 100)

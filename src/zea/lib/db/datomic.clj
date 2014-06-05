@@ -22,15 +22,19 @@
 
     zea/ILifecycle
     (start [this]
-      (let [key (zea/key this)
-            uri (-> app :config key :uri)
+      (let [file (-> this zea/config :schema)
+            uri (-> this zea/config :uri)
             created (d/create-database uri)
             conn (d/connect uri)]
         (when created
-          @(d/transact conn (-> app :resources key :schema
-                                io/resource slurp read-string)))
+          @(d/transact conn (-> app :resources file io/resource slurp read-string)))
         (assoc this :conn conn)))
 
     (stop [this]
       (d/release (:conn this))
       (dissoc this :conn))))
+
+
+
+
+
