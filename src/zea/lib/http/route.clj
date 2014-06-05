@@ -11,10 +11,9 @@
   "Simple routing component for Zea.
 
    Config:
-     * :route-map - route map where keys are component paths
-                    and values are patterns. Default to
-                    {[:http :root] '/'
-                     [:http :not-found] '*'}
+     * :route-map - route map where keys are patterns and values are
+                    component's paths. Default to {'/' [:http :root] 
+                                                   '*' [:http :not-found]}
 
    State:
      * :route-map - complied version of route-map."
@@ -29,7 +28,7 @@
     zea/ILifecycle
     (start [this]
       (assoc this
-        :route-map (map (fn [[a b]] [a (lexer b)])
+        :route-map (map (fn [[a b]] [(lexer a) b])
                         (:route-map (zea/config this)))))
 
     (stop [this]
@@ -39,6 +38,7 @@
     (route [this request]
       nil)
 
+    zea/IHandler
     (handler [this]
       (fn [request]
         (zea/component app (zea/route this request))))))

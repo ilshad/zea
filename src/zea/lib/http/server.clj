@@ -15,8 +15,8 @@
      * :max-ws - max websocket message size, default to 4M
      * :max-line - length limit for HTTP inital line and per header,
                    default to 4K
-     * :route-path - application path to routing component (which
-                     implements IRoute). Default to [:route]
+     * :handler - application path to handler (e.g. routing component),
+                  default to [:route]
 
    State:
      * :stop - function that stops the server.
@@ -33,12 +33,12 @@
        :max-body 8388608
        :max-ws 4194304
        :max-line 4096
-       :route-path [:route]})
+       :handler [:route]})
 
     zea/ILifecycle
     (start [this]
-      (let [route (zea/component app (-> this zea/config :route-path))]
-        (assoc this :stop (run-server (zea/handler route) (zea/config this)))))
+      (let [handler (zea/component app (-> this zea/config :handler))]
+        (assoc this :stop (run-server (zea/handler handler) (zea/config this)))))
 
     (stop [this]
       ((:stop this) :timeout 100)
