@@ -23,7 +23,7 @@
           tokenized-uri))
 
 (defn route
-  "Simple routing component for Zea.
+  "URL Routing component for Zea.
 
    Config:
      * :map - route-map where keys are patterns and values are
@@ -37,8 +37,7 @@
 
     zea/IConfig
     (setup [_]
-      {:map {"/" [:http :root]
-             "*" [:http :not-found]}})
+      {:map {"/" [:http :root], "*" [:http :not-found]}})
 
     zea/ILifecycle
     (start [c]
