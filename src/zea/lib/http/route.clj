@@ -8,25 +8,38 @@
        (mapv #(if-let [[_ v] (re-find #"^:(\w+)" %)] (keyword v) %))))
 
 (defn route
-  "Default routing component for Zea.
+  "Simple routing component for Zea.
 
    Config:
      * :route-map - route map where keys are component paths
                     and values are patterns. Default to
                     {[:http :root] '/'
-                     [:http :not-found] '*'}"
+                     [:http :not-found] '*'}
+
+   State:
+     * :route-map - complied version of route-map."
   [app]
   (reify
+
     zea/IConfig
     (config [_]
       {:route-map {[:http :root] "/"
                    [:http :not-found] "*"}})
+
+    zea/ILifecycle
+    (start [this]
+      (let [key (zea/key this)]
+        (assoc this
+          :route-map (map (fn [[a b]] [a (lexer b)])
+                          (-> app :config key :route-map)))))
+
+    (stop [this]
+      (dissoc this :route-map))
+    
     zea/IRoute
     (route [this request]
-      (let [key (zea/key this)
-            route-map (-> app :config key :route-map)
-            matcher (-> request :url parse-url compile-matcher)]
-        (matcher route-map)))
+      nil)
+
     (handler [this]
       (fn [request]
         (zea/component app (zea/route this request))))))

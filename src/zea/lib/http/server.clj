@@ -23,6 +23,7 @@
   "
   [app]
   (reify
+
     zea/IConfig
     (config [_]
       {:ip "0.0.0.0"
@@ -33,6 +34,7 @@
        :max-ws 4194304
        :max-line 4096
        :route-path [:route]})
+
     zea/ILifecycle
     (start [this]
       (let [key (zea/key this)
@@ -40,6 +42,7 @@
             route (zea/component app (:route-path config))
             stop (run-server (zea/handler route) config)]
         (assoc this :stop stop)))
+
     (stop [this]
       ((:stop this) :timeout 100)
       (dissoc this :stop))))

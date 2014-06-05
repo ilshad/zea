@@ -14,10 +14,12 @@
      * :conn - database connection."
   [app]
   (reify
+
     zea/IConfig
     (config [_]
       {:uri "datomic:mem://example"
        :schema "schema.edn"})
+
     zea/ILifecycle
     (start [this]
       (let [key (zea/key this)
@@ -28,6 +30,7 @@
           @(d/transact conn (-> app :resources key :schema
                                 io/resource slurp read-string)))
         (assoc this :conn conn)))
+
     (stop [this]
       (d/release (:conn this))
       (dissoc this :conn))))
