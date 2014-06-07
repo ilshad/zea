@@ -42,13 +42,13 @@
         template
         uri)))
 
-(defn compiled-route-map [route-map]
+(defn- compiled-route-map [route-map]
   (mapv
    (fn [[a b]]
      [(-> a lexer parser) b])
    route-map))
 
-(defn matcher [routes raw-uri]
+(defn- matcher [routes raw-uri]
   (let [uri (lexer raw-uri)
         [found index] (find-match routes uri)]
     (if-let [[[template path]] found]
@@ -81,7 +81,7 @@
 
     zea/IRoute
     (route [c req]
-      (matcher (:uri req) (:map c)))
+      (matcher (:map c) (:uri req)))
 
     zea/IHandler
     (handler [c]
