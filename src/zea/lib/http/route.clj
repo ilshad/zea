@@ -2,31 +2,56 @@
   (:require [zea.core :as zea]
             [clojure.string :as string]))
 
-(defn lexer [s]
+(defn- lexer [s]
   (filter (complement empty?) (string/split s #"/")))
 
-(defn parser [tokens]
-  (mapv (fn [token]
-          (if-let [[_ v] (re-find #"^:(\w+)" token)]
-            (keyword v)
-            token))
-        tokens))
+(defn- parser [tokens]
+  (mapv
+   (fn [string]
+     (if-let [[_ v] (re-find #"^:(\w+)" string)]
+       (keyword v)
+       string))
+   tokens))
 
-(defn matcher [tokenized-uri routes]
-  (reduce (fn [[index routes] segment]
-            [(inc index)
-             (filter (fn [[tokens path]]
-                       (let [t (tokens index)]
-                         (or (= segment t) (keyword? t))))
-                     routes)])
-          [0 routes]
-          tokenized-uri))
+(defn- routes-by-length [routes length]
+  (filter
+   (fn [[template _]]
+     (= (count template) length))
+   routes))
+
+(defn- routes-by-segment [routes index segment]
+  (filter
+   (fn [[template _]]
+     (let [token (template index)]
+       (or (= token segment) (keyword? token))))
+   routes))
+
+(defn- find-match [routes uri]
+  (reduce
+   (fn [[routes index] segment]
+     [(routes-by-segment routes index segment) (inc index)])
+   [(routes-by-length routes (count uri)) 0]
+   uri))
+
+(defn- extract-params [template uri]
+  (filter
+   (complement nil?)
+   (map #(when (keyword? %1) [%1 %2])
+        template
+        uri)))
 
 (defn compiled-route-map [route-map]
   (mapv
    (fn [[a b]]
      [(-> a lexer parser) b])
    route-map))
+
+(defn matcher [routes raw-uri]
+  (let [uri (lexer raw-uri)
+        [found index] (find-match routes uri)]
+    (if-let [[[template path]] found]
+      {:path path :params (into {} (extract-params template uri))}
+      {:path nil  :params {}})))
 
 (defn route
   "URL Routing component for Zea.
@@ -48,12 +73,13 @@
     zea/ILifecycle
     (start [c]
       (assoc c :map (compiled-route-map (:map (zea/config c app)))))
+
     (stop [c]
       (dissoc c :map))
 
     zea/IRoute
     (route [c req]
-      (-> req :uri lexer (matcher (:map c)) last))
+      (matcher (:uri req) (:map c)))
 
     zea/IHandler
     (handler [c]

@@ -3,26 +3,20 @@
             [zea.lib.http.route :refer :all]))
 
 (def route-map
-  {"/"              [:http :root]
-   "*"              [:http :not-found]
-   "/foo/bar"       [:http :foo-bar]
-   "/foo/:id/bar"   [:http :foo-?-bar]
-   "/foo/bar/:id"   [:http :foo-bar-?]
-   "/foo/:id"       [:http :foo-?]})
-
-(deftest test-compiled-route-map
-  (is (= (compiled-route-map route-map)
-         [[["*"] [:http :not-found]]
-          [["foo" :id] [:http :foo-?]]
-          [["foo" "bar"] [:http :foo-bar]]
-          [[] [:http :root]]
-          [["foo" "bar" :id] [:http :foo-bar-?]]
-          [["foo" :id "bar"] [:http :foo-?-bar]]])))
+  {"/"               [:http :root]
+   "*"               [:http :not-found]
+   "/foo/bar"        [:http :foo-bar]
+   "/foo/:id/bar"    [:http :foo-?-bar]
+   "/foo/bar/:id"    [:http :foo-bar-?]
+   "/foo/bar/:a/:b"  [:http :foo-bar-?-?]
+   "/foo/:id"        [:http :foo-?]})
 
 (deftest test-matcher
-  (is (= (matcher (lexer "/foo/bar/42")
-                  (compiled-route-map route-map))
-         nil)))
+  (is (= (matcher (compiled-route-map route-map) "/")
+         {:path [:http :root], :params {}}))
+  (is (= (matcher (compiled-route-map route-map) "/foo/bar/42")
+         {:path [:http :foo-bar-?], :params {:id "42"}}))
+  (is (= (matcher (compiled-route-map route-map) "/foo/bar/42/77")
+         {:path [:http :foo-bar-?-?], :params {:a "42" :b "77"}})))
 
-(matcher (lexer "/foo/bar/42")
-         (compiled-route-map route-map))
+
