@@ -17,7 +17,7 @@
 
     zea/IConfig
     (setup [_]
-      {:uri "datomic:mem://example"
+      {:uri "datomic:mem://zea"
        :schema "schema.edn"})
 
     zea/ILifecycle

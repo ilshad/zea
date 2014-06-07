@@ -1,4 +1,4 @@
-(ns zea.core-test
+(ns zea.test.test-core
   (:require [clojure.test :refer :all]
             [zea.core :refer :all]))
 

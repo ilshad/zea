@@ -2,17 +2,17 @@
   (:require [zea.core :as zea]
             [clojure.string :as string]))
 
-(defn- lexer [s]
+(defn lexer [s]
   (filter (complement empty?) (string/split s #"/")))
 
-(defn- parser [tokens]
+(defn parser [tokens]
   (mapv (fn [token]
           (if-let [[_ v] (re-find #"^:(\w+)" token)]
             (keyword v)
             token))
         tokens))
 
-(defn- matcher [tokenized-uri routes]
+(defn matcher [tokenized-uri routes]
   (reduce (fn [[index routes] segment]
             [(inc index)
              (filter (fn [[tokens path]]
@@ -21,6 +21,12 @@
                      routes)])
           [0 routes]
           tokenized-uri))
+
+(defn compiled-route-map [route-map]
+  (mapv
+   (fn [[a b]]
+     [(-> a lexer parser) b])
+   route-map))
 
 (defn route
   "URL Routing component for Zea.
@@ -41,9 +47,7 @@
 
     zea/ILifecycle
     (start [c]
-      (assoc c :map (mapv (fn [[a b]] [(-> a lexer parser) b])
-                          (:map (zea/config c app)))))
-    
+      (assoc c :map (compiled-route-map (:map (zea/config c app)))))
     (stop [c]
       (dissoc c :map))
 
