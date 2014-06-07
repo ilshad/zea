@@ -3,7 +3,9 @@
             [clojure.string :as string]))
 
 (defn- lexer [s]
-  (filter (complement empty?) (string/split s #"/")))
+  (filter
+   (complement empty?)
+   (string/split s #"/")))
 
 (defn- parser [tokens]
   (mapv
@@ -83,4 +85,8 @@
 
     zea/IHandler
     (handler [c]
-      #(zea/component (zea/route c %) app))))
+      (fn [req]
+        (let [{:keys [path params]} (zea/route c req)
+              c+ (zea/component path app)
+              req+ (update-in req [:params] (partial merge params))]
+          (zea/response c+ req+))))))
