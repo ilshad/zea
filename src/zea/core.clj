@@ -13,7 +13,7 @@
 
 (defprotocol ITraversable
   (path [c]
-    "Return full app path to this component."))
+    "Return app path to this component."))
 
 (defprotocol IHandler
   (handler [c]

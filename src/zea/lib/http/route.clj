@@ -42,16 +42,17 @@
         template
         uri)))
 
-(defn- compiled-route-map [route-map]
+(defn compiled-route-map [route-map]
   (mapv
    (fn [[a b]]
      [(-> a lexer parser) b])
    route-map))
 
-(defn- matcher [routes raw-uri]
+(defn matcher [routes method raw-uri]
   (let [uri (lexer raw-uri)
-        [found index] (find-match routes uri)]
-    (if-let [[[template path]] found]
+        [found index] (find-match routes uri)
+        [template methods->paths] (first found)]
+    (if-let [path (get methods->paths method)]
       {:path path :params (into {} (extract-params template uri))}
       {:path nil  :params {}})))
 
@@ -59,18 +60,17 @@
   "URL Routing component for Zea.
 
    Config:
-     * :map - route-map where keys are patterns and values are
-              component's paths.
-              Default to {'/' [:http :root], '*' [:http :not-found]}
+     * :map - route-map: {string-pattern -> {request-method -> app-path}}
 
    State:
-     * :map - 'compiled' version of route-map."
+     * :map - 'compiled' version of route-map (some optimizations,
+              less human readable)"
   [app]
   (reify
 
     zea/IConfig
     (setup [_]
-      {:map {"/" [:http :root], "*" [:http :not-found]}})
+      {:map {"/" {:get [:http :hello]}}})
 
     zea/ILifecycle
     (start [c]
@@ -81,12 +81,11 @@
 
     zea/IRoute
     (route [c req]
-      (matcher (:map c) (:uri req)))
+      (matcher (:map c) (:request-method req) (:uri req)))
 
     zea/IHandler
     (handler [c]
       (fn [req]
-        (let [{:keys [path params]} (zea/route c req)
-              c+ (zea/component path app)
-              req+ (update-in req [:params] (partial merge params))]
-          (zea/response c+ req+))))))
+        (let [{:keys [path params]} (zea/route c req)]
+          (zea/response (zea/component path app)
+                        (update-in req [:params] (partial merge params))))))))

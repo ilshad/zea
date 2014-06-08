@@ -34,8 +34,3 @@
     (stop [c]
       (d/release (:conn c))
       (dissoc c :conn))))
-
-
-
-
-
