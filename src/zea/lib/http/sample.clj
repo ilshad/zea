@@ -12,7 +12,7 @@
 
 (defn hello-configurable
   "Configurable view component. This component adds :greeting
-   parameter into app's config, with default value 'Salut'."
+   parameter into app's config, with default value 'Salut'"
   [app]
   (reify
 
@@ -31,7 +31,7 @@
 
     zea/ILifecycle
     (start [c]
-      (assoc c :counter (ref 0)))
+      (assoc c :counter (atom 0)))
 
     (stop [c]
       (dissoc c :counter))
@@ -39,5 +39,5 @@
     zea/IResponse
     (response [c request]
       (let [counter (:counter c)]
-        (dosync (alter counter inc))
+        (swap! counter inc)
         (str "Hello, " counter "st")))))

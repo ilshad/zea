@@ -87,5 +87,5 @@
     (handler [c]
       (fn [req]
         (let [{:keys [path params]} (zea/route c req)]
-          (zea/response (zea/component path app)
+          (zea/response (get-in app path)
                         (update-in req [:params] (partial merge params))))))))

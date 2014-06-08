@@ -11,10 +11,6 @@
   (stop [c]
     "Shut down this component and return its updated version."))
 
-(defprotocol ITraversable
-  (path [c]
-    "Return app path to this component."))
-
 (defprotocol IHandler
   (handler [c]
     "Return Ring handler function."))
@@ -29,12 +25,21 @@
   (response [c request]
     "Take Ring request, return Ring response."))
 
-(defn config 
-  "Return actual config for this component."
+(defn config
+  "Return config map for this component."
   [c app]
-  (get (:config app) (last (path c))))
+  (get-in (:config app) (:path (meta c))))
 
-(defn component
-  "Return actual component."
-  [path app]
-  nil)
+(defn install
+  "Install component into app."
+  [app path create-component]
+  (let [c (vary-meta (create-component app) assoc :path path)]
+    (-> app
+        (assoc-in path nil)
+        (assoc-in path c)
+        (assoc-in (into [:config] path) (setup c)))))
+
+(defn install!
+  "Shorhand for app in atom."
+  [app-atom path create-component]
+  (swap! app-atom install path create-component))
