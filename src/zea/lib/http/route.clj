@@ -74,14 +74,16 @@
 
     zea/ILifecycle
     (start [c]
-      {:map (compiled-route-map (:map (zea/config c @app)))})
+      {:map (compiled-route-map (:map (zea/get-config c @app)))})
 
     (stop [c m]
       (dissoc m :map))
 
     zea/IRoute
     (route [c req]
-      (matcher (:map c) (:request-method req) (:uri req)))
+      (matcher (:map (zea/get-state c @app))
+               (:request-method req)
+               (:uri req)))
 
     zea/IHandler
     (handler [c]

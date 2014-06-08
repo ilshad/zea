@@ -22,7 +22,7 @@
 
     zea/ILifecycle
     (start [c]
-      (let [conf (zea/config c @app)
+      (let [conf (zea/get-config c @app)
             file (:schema conf)
             uri (:uri conf)
             created (d/create-database uri)
