@@ -16,7 +16,7 @@
   (reify
 
     zea/IConfig
-    (setup [_]
+    (config [_]
       {:uri "datomic:mem://zea"
        :schema "schema.edn"})
 

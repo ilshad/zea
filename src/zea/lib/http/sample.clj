@@ -17,12 +17,12 @@
   (reify
 
     zea/IConfig
-    (setup [_]
+    (config [_]
       {:greeting "Salut"})
 
     zea/IResponse
     (response [c _]
-      (str (:greeting (zea/config c @app)) " world!"))))
+      (str (:greeting (zea/get-config c @app)) " world!"))))
 
 (defn hello-stateful
   "View component with state."
