@@ -30,16 +30,11 @@
   [c app]
   (get-in (:config app) (:path (meta c))))
 
-(defn install
-  "Install component into app."
-  [app path create-component]
-  (let [c (vary-meta (create-component app) assoc :path path)]
-    (-> app
-        (assoc-in path nil)
-        (assoc-in path c)
-        (assoc-in (into [:config] path) (setup c)))))
-
 (defn install!
-  "Shorhand for app in atom."
-  [app-atom path create-component]
-  (swap! app-atom install path create-component))
+  "Install component into app. Arguments: app atom, app path
+   and function which creates component."
+  [app path component]
+  (let [c (-> (component app)
+              (vary-meta assoc :path path))]
+    (swap! app assoc-in path c)
+    (swap! app assoc-in (into [:config] path) (setup c))))

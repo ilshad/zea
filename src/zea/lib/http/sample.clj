@@ -11,7 +11,7 @@
       (str "Hello world!"))))
 
 (defn hello-configurable
-  "Configurable view component. This component adds :greeting
+  "Configurable view component. Adds [`component_path...` :greeting]
    parameter into app's config, with default value 'Salut'"
   [app]
   (reify
@@ -22,7 +22,7 @@
 
     zea/IResponse
     (response [c _]
-      (str (:greeting (zea/config c app)) " world!"))))
+      (str (:greeting (zea/config c @app)) " world!"))))
 
 (defn hello-stateful
   "View component with state."

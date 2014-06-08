@@ -74,7 +74,7 @@
 
     zea/ILifecycle
     (start [c]
-      (assoc c :map (compiled-route-map (:map (zea/config c app)))))
+      (assoc c :map (compiled-route-map (:map (zea/config c @app)))))
 
     (stop [c]
       (dissoc c :map))
@@ -87,5 +87,5 @@
     (handler [c]
       (fn [req]
         (let [{:keys [path params]} (zea/route c req)]
-          (zea/response (get-in app path)
+          (zea/response (get-in @app path)
                         (update-in req [:params] (partial merge params))))))))
