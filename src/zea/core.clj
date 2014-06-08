@@ -3,15 +3,16 @@
 (defprotocol IConfig
   "Configurable component."
   (config [c]
-    "Return config map with default values. This method is used
+    "Returns config map with default values. This method is used
      to install configuration schema for this component."))
 
 (defprotocol ILifecycle
   "Stateful component."
   (start [c]
-    "Start this component and return its updated version.")
-  (stop [c]
-    "Shut down this component and return its updated version."))
+    "Starts this component and returns initial state in map.")
+  (stop [c state-map]
+    "Stops down this component and returns updated version of
+     its state map."))
 
 (defprotocol IHandler
   "Ring handler constructor."
@@ -21,17 +22,20 @@
 (defprotocol IResponse
   "Ring handler."
   (response [c request]
-    "Take Ring request, return Ring response."))
+    "Handle request and return response."))
 
 (defprotocol IRoute
   "HTTP routing."
   (route [c request]
-    " Look at request data and return map with keys:
-       * :path - app path to some component,
-       * :params - route params, map."))
+    "Look at request data and return associative data structure:
+       * :path - app path (vector) to some component,
+       * :params - routing params (map)."))
 
-(defn get-config [component app]
-  (get-in (:config app) (:path (meta component))))
+(defn get-config [c app]
+  (get-in (:config app) (:path (meta c))))
+
+(defn get-state [c app]
+  (get-in (:state app) (:path (meta c))))
 
 (defn- try-config [c]
   (try (config c) (catch java.lang.IllegalArgumentException e)))
@@ -42,3 +46,4 @@
     (swap! app-atom assoc-in path c)
     (when-let [cfg (try-config c)]
       (swap! app-atom assoc-in (into [:config] path) cfg))))
+

@@ -74,10 +74,10 @@
 
     zea/ILifecycle
     (start [c]
-      (assoc c :map (compiled-route-map (:map (zea/config c @app)))))
+      {:map (compiled-route-map (:map (zea/config c @app)))})
 
-    (stop [c]
-      (dissoc c :map))
+    (stop [c m]
+      (dissoc m :map))
 
     zea/IRoute
     (route [c req]

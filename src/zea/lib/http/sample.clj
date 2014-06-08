@@ -31,13 +31,13 @@
 
     zea/ILifecycle
     (start [c]
-      (assoc c :counter (atom 0)))
+      {:counter (atom 0)})
 
-    (stop [c]
-      (dissoc c :counter))
+    (stop [c m]
+      (dissoc m :counter))
 
     zea/IResponse
     (response [c request]
-      (let [counter (:counter c)]
+      (let [counter (:counter (zea/get-state c app))]
         (swap! counter inc)
-        (str "Hello, " counter "st")))))
+        (str "Hello, " @counter "st")))))
