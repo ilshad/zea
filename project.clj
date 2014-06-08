@@ -7,6 +7,5 @@
                  [org.clojure/core.async "0.1.303.0-886421-alpha"]
                  [org.clojure/algo.monads "0.1.5"]
                  [http-kit "2.1.16"]]
-  :profiles
-  {:dev
-   {:dependencies [[com.datomic/datomic-pro "0.9.4815"]]}})
+  :profiles {:dev {:source-paths ["dev"]
+                   :dependencies [[com.datomic/datomic-pro "0.9.4815"]]}})

@@ -26,15 +26,14 @@
     "Take Ring request, return Ring response."))
 
 (defn config
-  "Return config map for this component."
-  [c app]
-  (get-in (:config app) (:path (meta c))))
+  "Return config of component."
+  [component app]
+  (get-in (:config app) (:path (meta component))))
 
 (defn install!
-  "Install component into app. Arguments: app atom, app path
-   and function which creates component."
-  [app path component]
-  (let [c (-> (component app)
+  "Install component into app."
+  [app-atom path create-component]
+  (let [c (-> (create-component app-atom)
               (vary-meta assoc :path path))]
-    (swap! app assoc-in path c)
-    (swap! app assoc-in (into [:config] path) (setup c))))
+    (swap! app-atom assoc-in path c)
+    (swap! app-atom assoc-in (into [:config] path) (setup c))))
