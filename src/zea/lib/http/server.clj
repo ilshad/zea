@@ -42,6 +42,6 @@
             stop (run-server (zea/handler handler) conf)]
         {:stop stop}))
 
-    (stop [c m]
-      ((:stop m) :timeout 100)
-      (dissoc m :stop))))
+    (stop [c]
+      ((:stop (zea/get-state c app)) :timeout 1000)
+      nil)))

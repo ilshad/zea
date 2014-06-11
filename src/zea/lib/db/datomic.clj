@@ -31,6 +31,6 @@
           @(d/transact conn (-> @app :resources file io/resource slurp read-string)))
         {:conn conn}))
 
-    (stop [c m]
-      (d/release (:conn m))
-      (dissoc m :conn))))
+    (stop [c]
+      (d/release (:conn (zea/get-state c app)))
+      nil)))

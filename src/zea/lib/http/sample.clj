@@ -33,9 +33,6 @@
     (start [c]
       {:counter (atom 0)})
 
-    (stop [c m]
-      (dissoc m :counter))
-
     zea/IResponse
     (response [c request]
       (let [counter (:counter (zea/get-state c app))]

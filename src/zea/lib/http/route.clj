@@ -76,9 +76,6 @@
     (start [c]
       {:map (compiled-route-map (:map (zea/get-config c @app)))})
 
-    (stop [c m]
-      (dissoc m :map))
-
     zea/IRoute
     (route [c req]
       (matcher (:map (zea/get-state c @app))
