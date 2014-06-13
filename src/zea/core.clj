@@ -43,13 +43,6 @@
   (response [c request]
     "Handle request and return response."))
 
-(defprotocol IRoute
-  "HTTP routing."
-  (route [c request]
-    "Look at request data and return associative data structure:
-       * :path - app path (vector) to some component,
-       * :params - routing params (map)."))
-
 (defn get-config
   "Get config for the component."
   [c app]

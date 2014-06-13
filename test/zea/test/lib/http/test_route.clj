@@ -12,14 +12,14 @@
 
 (deftest test-matcher
   (is (= (matcher (compiled-route-map route-map) :get "/")
-         {:path [:http :root], :params {}}))
+         [[:http :root] {}]))
   (is (= (matcher (compiled-route-map route-map) :get "/foo")
-         {:path [:http :foo-get], :params {}}))
+         [[:http :foo-get] {}]))
   (is (= (matcher (compiled-route-map route-map) :post "/foo")
-         {:path [:http :foo-post], :params {}}))
+         [[:http :foo-post] {}]))
   (is (= (matcher (compiled-route-map route-map) :get "/foo/bar/42")
-         {:path [:http :foo-bar-?], :params {:id "42"}}))
+         [[:http :foo-bar-?] {:id "42"}]))
   (is (= (matcher (compiled-route-map route-map) :get "/foo/bar/42/77")
-         {:path [:http :foo-bar-?-?], :params {:a "42" :b "77"}})))
+         [[:http :foo-bar-?-?] {:a "42" :b "77"}])))
 
 

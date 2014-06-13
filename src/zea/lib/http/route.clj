@@ -53,8 +53,8 @@
         [found index] (find-match routes uri)
         [template methods->paths] (first found)]
     (if-let [path (get methods->paths method)]
-      {:path path :params (into {} (extract-params template uri))}
-      {:path nil  :params {}})))
+      [path (into {} (extract-params template uri))]
+      [nil {}])))
 
 (defn route
   "URL Routing component for Zea.
@@ -69,22 +69,18 @@
   (reify
 
     zea/IConfig
-    (setup [_]
+    (config [_]
       {:map {"/" {:get [:http :hello]}}})
 
     zea/ILifecycle
     (start [c]
       {:map (compiled-route-map (:map (zea/get-config c @app)))})
 
-    zea/IRoute
-    (route [c req]
-      (matcher (:map (zea/get-state c @app))
-               (:request-method req)
-               (:uri req)))
-
     zea/IHandler
     (handler [c]
       (fn [req]
-        (let [{:keys [path params]} (zea/route c req)]
+        (let [[path params] (matcher (:map (zea/get-state c @app))
+                                     (:request-method req)
+                                     (:uri req))]
           (zea/response (get-in @app path)
                         (update-in req [:params] (partial merge params))))))))
