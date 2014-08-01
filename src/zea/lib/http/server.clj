@@ -23,7 +23,7 @@
   "
   [app]
   (reify
-
+    
     zea/IConfig
     (config [_]
       {:ip "0.0.0.0"
@@ -38,10 +38,10 @@
     zea/ILifecycle
     (start [c]
       (let [conf (zea/get-config c @app)
-            handler (get-in @app (:handler conf))
-            stop (run-server (zea/handler handler) conf)]
+            handler (zea/get-component (:handler conf) app)
+            stop (run-server (partial zea/response handler) conf)]
         {:stop stop}))
-
+    
     (stop [c]
       ((:stop (zea/get-state c app)) :timeout 1000)
       nil)))

@@ -5,7 +5,7 @@
   "View component"
   [app]
   (reify
-
+    
     zea/IResponse
     (response [_ _]
       (str "Hello world!"))))
@@ -15,11 +15,11 @@
    parameter into app's config, with default value 'Salut'"
   [app]
   (reify
-
+    
     zea/IConfig
     (config [_]
       {:greeting "Salut"})
-
+    
     zea/IResponse
     (response [c _]
       (str (:greeting (zea/get-config c @app)) " world!"))))
@@ -28,11 +28,11 @@
   "View component with state."
   [app]
   (reify
-
+    
     zea/ILifecycle
     (start [c]
       {:counter (atom 0)})
-
+    
     zea/IResponse
     (response [c request]
       (let [counter (:counter (zea/get-state c app))]

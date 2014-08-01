@@ -1,6 +1,4 @@
-(ns zea.core
-  (:require [clojure.core.async :refer [go-loop chan <! >!]]
-            [clojure.algo.monads :refer :all]))
+(ns zea.core)
 
 (defprotocol IConfig
   "Configurable component."
@@ -33,37 +31,31 @@
   java.lang.Object
   (behavior [c] nil))
 
-(defprotocol IHandler
-  "Ring handler constructor."
-  (handler [c]
-    "Return Ring handler function."))
-
 (defprotocol IResponse
   "Ring handler."
   (response [c request]
     "Handle request and return response."))
 
+(defn install!
+  "Install component into app."
+  [app path constructor]
+  (let [c (-> (constructor app) (vary-meta assoc :path path))]
+    (-> app
+        (swap! assoc-in (cons :components path) c)
+        (swap! assoc-in (cons :config path) (config c))
+        (swap! assoc-in (cons :state path) (start c)))))
+
 (defn get-config
   "Get config for the component."
   [c app]
-  (get-in (:config app) (:path (meta c))))
+  (get-in (:config @app) (:path (meta c))))
 
 (defn get-state
   "Get actual state map of the component."
   [c app]
-  (get-in (:state app) (:path (meta c))))
+  (get-in (:state @app) (:path (meta c))))
 
-(defn install!
-  "Install component into map which contains whole application."
-  [app path create-component]
-  (let [c (-> (create-component app)
-              (vary-meta assoc :path path))]
-    (-> app
-        (swap! assoc-in (cons :main path) c)
-        (swap! assoc-in (cons :config path) (config c))
-        (swap! assoc-in (cons :state path) (start c)))))
-
-(defmacro compose-state [& body]
-  `(with-monad
-     state-m
-     (m-seq [~@body])))
+(defn get-component
+  "Find component"
+  [path app]
+  (get-in (:component @app) path))

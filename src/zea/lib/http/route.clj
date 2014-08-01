@@ -4,49 +4,49 @@
 
 (defn- lexer [s]
   (filter
-   (complement empty?)
-   (string/split s #"/")))
+    (complement empty?)
+    (string/split s #"/")))
 
 (defn- parser [tokens]
   (mapv
-   (fn [string]
-     (if-let [[_ v] (re-find #"^:(\w+)" string)]
-       (keyword v)
-       string))
-   tokens))
+    (fn [string]
+      (if-let [[_ v] (re-find #"^:(\w+)" string)]
+        (keyword v)
+        string))
+    tokens))
 
 (defn- routes-by-length [routes length]
   (filter
-   (fn [[template _]]
-     (= (count template) length))
-   routes))
+    (fn [[template _]]
+      (= (count template) length))
+    routes))
 
 (defn- routes-by-segment [routes index segment]
   (filter
-   (fn [[template _]]
-     (let [token (template index)]
-       (or (= token segment) (keyword? token))))
-   routes))
+    (fn [[template _]]
+      (let [token (template index)]
+        (or (= token segment) (keyword? token))))
+    routes))
 
 (defn- find-match [routes uri]
   (reduce
-   (fn [[routes index] segment]
-     [(routes-by-segment routes index segment) (inc index)])
-   [(routes-by-length routes (count uri)) 0]
-   uri))
+    (fn [[routes index] segment]
+      [(routes-by-segment routes index segment) (inc index)])
+    [(routes-by-length routes (count uri)) 0]
+    uri))
 
 (defn- extract-params [template uri]
   (filter
-   (complement nil?)
-   (map #(when (keyword? %1) [%1 %2])
-        template
-        uri)))
+    (complement nil?)
+    (map #(when (keyword? %1) [%1 %2])
+      template
+      uri)))
 
 (defn compiled-route-map [route-map]
   (mapv
-   (fn [[a b]]
-     [(-> a lexer parser) b])
-   route-map))
+    (fn [[a b]]
+      [(-> a lexer parser) b])
+    route-map))
 
 (defn matcher [routes method raw-uri]
   (let [uri (lexer raw-uri)
@@ -59,6 +59,12 @@
 (defn route
   "URL Routing component for Zea.
 
+   Example of route map:
+   {\"/doc/:id\" {:get [:get-doc] :post [:post-doc]}}
+   where :id is route param and it will be merged into :params map
+   in request. [:get-doc] and [:post-doc] is app paths to the
+   components.
+
    Config:
      * :map - route-map: {string-pattern -> {request-method -> app-path}}
 
@@ -67,20 +73,19 @@
               less human readable)"
   [app]
   (reify
-
+    
     zea/IConfig
     (config [_]
       {:map {"/" {:get [:http :hello]}}})
-
+    
     zea/ILifecycle
     (start [c]
-      {:map (compiled-route-map (:map (zea/get-config c @app)))})
-
-    zea/IHandler
-    (handler [c]
-      (fn [req]
-        (let [[path params] (matcher (:map (zea/get-state c @app))
-                                     (:request-method req)
-                                     (:uri req))]
-          (zea/response (get-in @app path)
-                        (update-in req [:params] (partial merge params))))))))
+      {:map (compiled-route-map (:map (zea/get-config c app)))})
+    
+    zea/IResponse
+    (response [c req]
+      (let [[path params] (matcher (:map (zea/get-state c app))
+                            (:request-method req)
+                            (:uri req))]
+        (zea/response (zea/get-component path app)
+          (update-in req [:params] (partial merge params)))))))

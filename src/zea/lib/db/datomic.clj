@@ -30,7 +30,7 @@
         (when created
           @(d/transact conn (-> @app :resources file io/resource slurp read-string)))
         {:conn conn}))
-
+    
     (stop [c]
       (d/release (:conn (zea/get-state c app)))
       nil)))
