@@ -35,13 +35,13 @@
        :max-line 4096
        :handler [:route]})
 
-    zea/ILifecycle
-    (start [c]
-      (let [conf (zea/get-config c @app)
-            handler (zea/get-component (:handler conf) app)
+    zea/IState
+    (start [e]
+      (let [conf (zea/get-config e app)
+            handler (zea/f (:handler conf) app)
             stop (run-server (partial zea/response handler) conf)]
         {:stop stop}))
     
-    (stop [c]
+    (stop [e]
       ((:stop (zea/get-state c app)) :timeout 1000)
       nil)))

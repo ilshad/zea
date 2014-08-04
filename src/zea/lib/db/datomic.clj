@@ -20,17 +20,18 @@
       {:uri "datomic:mem://zea"
        :schema "schema.edn"})
 
-    zea/ILifecycle
-    (start [c]
-      (let [conf (zea/get-config c @app)
-            file (:schema conf)
+    zea/IState
+    (start [e]
+      (let [conf (zea/get-config e @app)
+            filename (:schema conf)
             uri (:uri conf)
             created (d/create-database uri)
             conn (d/connect uri)]
         (when created
-          @(d/transact conn (-> @app :resources file io/resource slurp read-string)))
+          @(d/transact conn
+             (-> filename io/resource slurp read-string)))
         {:conn conn}))
     
-    (stop [c]
-      (d/release (:conn (zea/get-state c app)))
+    (stop [e]
+      (d/release (:conn (zea/get-state e app)))
       nil)))
