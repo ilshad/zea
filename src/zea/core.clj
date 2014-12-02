@@ -1,61 +1,47 @@
 (ns zea.core)
 
 (defprotocol IConfig
-  "Configurable ear."
-  (config [e]
-    "Returns config map with default values. This method is used
-     to install configuration schema for this ear."))
+  (config [e]))
+
+(defprotocol IState
+  (start [e])
+  (stop [e]))
+
+(defprotocol IActor
+  (process [e message]))
+
+(defprotocol IResponse
+  (response [e request]))
 
 (extend-protocol IConfig
   java.lang.Object
   (config [e] nil))
-
-(defprotocol IState
-  "Stateful ear."
-  (start [e]
-    "Starts this ear and returns initial state map.")
-  (stop [e]
-    "Stops this ear and returns updated version of its state map."))
 
 (extend-protocol IState
   java.lang.Object
   (start [e] nil)
   (stop [e] nil))
 
-(defprotocol IActor
-  "Ear that behaves like an actor."
-  (process [e message]
-    "Process message."))
-
 (extend-protocol IActor
   java.lang.Object
   (process [e message] nil))
 
-(defprotocol IResponse
-  "Ring handler."
-  (response [e request]
-    "Handle request and return response."))
+(def ^:private sources-path :src)
+(def ^:private config-path :cfg)
+(def ^:private state-path :var)
 
-(defn install!
-  "Install ear into app."
-  [app path constructor]
+(defn install! [app path constructor]
   (let [e (-> (constructor app) (vary-meta assoc :path path))]
-    (-> app
-        (swap! assoc-in (cons :source path) e)
-        (swap! assoc-in (cons :config path) (config e))
-        (swap! assoc-in (cons :state path) (start e)))))
+    (swap! app assoc-in (cons sources-path path) e)
+    (swap! app assoc-in (cons config-path path) (config e))
+    (swap! app assoc-in (cons state-path path) (start e))))
 
 (defn get-config
-  "Get config for the ear."
-  [e app]
-  (get-in (:config @app) (:path (meta e))))
+  ([e app]    (get-in (config-path @app) (-> e meta :path)))
+  ([e app kw] (kw (get-config e app))))
 
 (defn get-state
-  "Get actual state map of the ear."
-  [e app]
-  (get-in (:state @app) (:path (meta e))))
+  ([e app]    (get-in (state-path @app) (-> e meta :path)))
+  ([e app kw] (kw (get-state e app))))
 
-(defn f
-  "Get ear."
-  [path app]
-  (get-in (:source @app) path))
+(defn get-ear [path app] (get-in (sources-path @app) path))

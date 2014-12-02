@@ -16,7 +16,7 @@
      * :max-line - length limit for HTTP inital line and per header,
                    default to 4K
      * :handler - application path to handler (e.g. routing component),
-                  default to [:route]
+                  default to [:http-default]
 
    State:
      * :stop - function that stops the server.
@@ -33,15 +33,16 @@
        :max-body 8388608
        :max-ws 4194304
        :max-line 4096
-       :handler [:route]})
+       :handler [:http-default]})
 
     zea/IState
     (start [e]
       (let [conf (zea/get-config e app)
-            handler (zea/f (:handler conf) app)
+            handler (zea/get-ear (:handler conf) app)
             stop (run-server (partial zea/response handler) conf)]
         {:stop stop}))
     
     (stop [e]
-      ((:stop (zea/get-state c app)) :timeout 1000)
+      (let [f (zea/get-state e app :stop)]
+        (f :timeout 1000))
       nil)))

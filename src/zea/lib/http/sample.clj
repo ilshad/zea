@@ -8,7 +8,7 @@
     
     zea/IResponse
     (response [_ _]
-      (str "Hello world!"))))
+      {:body "Hello world!"})))
 
 (defn hello-configurable
   "Configurable view component. Adds [`component_path...` :greeting]
@@ -21,20 +21,20 @@
       {:greeting "Salut"})
     
     zea/IResponse
-    (response [c _]
-      (str (:greeting (zea/get-config c @app)) " world!"))))
+    (response [e _]
+      (str (zea/get-config e app :greeting) " world!"))))
 
 (defn hello-stateful
   "View component with state."
   [app]
   (reify
     
-    zea/ILifecycle
-    (start [c]
+    zea/IState
+    (start [_]
       {:counter (atom 0)})
     
     zea/IResponse
-    (response [c request]
-      (let [counter (:counter (zea/get-state c app))]
+    (response [e request]
+      (let [counter (zea/get-state e app :counter)]
         (swap! counter inc)
         (str "Hello, " @counter "st")))))

@@ -79,13 +79,13 @@
       {:map {"/" {:get [:http :hello]}}})
     
     zea/ILifecycle
-    (start [c]
-      {:map (compiled-route-map (:map (zea/get-config c app)))})
+    (start [e]
+      {:map (compiled-route-map (:map (zea/get-config e app)))})
     
     zea/IResponse
-    (response [c req]
-      (let [[path params] (matcher (:map (zea/get-state c app))
+    (response [e req]
+      (let [[path params] (matcher (:map (zea/get-state e app))
                             (:request-method req)
                             (:uri req))]
-        (zea/response (zea/get-component path app)
+        (zea/response (zea/get-ear path app)
           (update-in req [:params] (partial merge params)))))))
