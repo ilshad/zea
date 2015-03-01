@@ -37,12 +37,12 @@
 
     zea/IState
     (start [e]
-      (let [conf (zea/get-config e app)
-            handler (zea/get-ear (:handler conf) app)
+      (let [conf (zea/cfg e app)
+            handler (zea/ear (:handler conf) app)
             stop (run-server (partial zea/response handler) conf)]
         {:stop stop}))
     
     (stop [e]
-      (let [f (zea/get-state e app :stop)]
+      (let [f (zea/state e app :stop)]
         (f :timeout 1000))
       nil)))

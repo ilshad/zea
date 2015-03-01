@@ -22,16 +22,15 @@
 
     zea/IState
     (start [e]
-      (let [conf (zea/get-config e @app)
+      (let [conf (zea/cfg e @app)
             filename (:schema conf)
             uri (:uri conf)
             created (d/create-database uri)
             conn (d/connect uri)]
         (when created
-          @(d/transact conn
-             (-> filename io/resource slurp read-string)))
+          @(d/transact conn (-> filename io/resource slurp read-string)))
         {:conn conn}))
     
     (stop [e]
-      (d/release (:conn (zea/get-state e app)))
+      (d/release (:conn (zea/state e app)))
       nil)))

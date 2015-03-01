@@ -22,7 +22,7 @@
     
     zea/IResponse
     (response [e _]
-      (str (zea/get-config e app :greeting) " world!"))))
+      (str (zea/cfg e app :greeting) " world!"))))
 
 (defn hello-stateful
   "View component with state."
@@ -35,6 +35,6 @@
     
     zea/IResponse
     (response [e request]
-      (let [counter (zea/get-state e app :counter)]
+      (let [counter (zea/state e app :counter)]
         (swap! counter inc)
         (str "Hello, " @counter "st")))))

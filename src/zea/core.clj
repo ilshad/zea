@@ -26,22 +26,22 @@
   java.lang.Object
   (process [e message] nil))
 
-(def ^:private sources-path :src)
-(def ^:private config-path :cfg)
-(def ^:private state-path :var)
+(def ^:private path-src :src)
+(def ^:private path-cfg :cfg)
+(def ^:private path-var :var)
 
-(defn install! [app path constructor]
+(defn install [app path constructor]
   (let [e (-> (constructor app) (vary-meta assoc :path path))]
-    (swap! app assoc-in (cons sources-path path) e)
-    (swap! app assoc-in (cons config-path path) (config e))
-    (swap! app assoc-in (cons state-path path) (start e))))
+    (swap! app assoc-in (cons path-src path) e)
+    (swap! app assoc-in (cons path-cfg path) (config e))
+    (swap! app assoc-in (cons path-var path) (start e))))
 
-(defn get-config
-  ([e app]    (get-in (config-path @app) (-> e meta :path)))
-  ([e app kw] (kw (get-config e app))))
+(defn cfg
+  ([e app]    (get-in (path-cfg @app) (-> e meta :path)))
+  ([e app kw] (kw (cfg e app))))
 
-(defn get-state
-  ([e app]    (get-in (state-path @app) (-> e meta :path)))
-  ([e app kw] (kw (get-state e app))))
+(defn state
+  ([e app]    (get-in (path-var @app) (-> e meta :path)))
+  ([e app kw] (kw (state e app))))
 
-(defn get-ear [path app] (get-in (sources-path @app) path))
+(defn ear [path app] (get-in (path-src @app) path))
