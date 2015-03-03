@@ -19,11 +19,11 @@
                   default to [:http-default]
 
    State:
-     * :stop - function that stops the server.
+     * :stop - this function stops the server.
   "
   [app]
   (reify
-    
+
     zea/IConfig
     (config [_]
       {:ip "0.0.0.0"
@@ -33,15 +33,14 @@
        :max-body 8388608
        :max-ws 4194304
        :max-line 4096
-       :handler [:http-default]})
+       :handler [:http :default]})
 
     zea/IState
     (start [e]
       (let [conf (zea/cfg e app)
-            handler (zea/ear (:handler conf) app)
-            stop (run-server (partial zea/response handler) conf)]
-        {:stop stop}))
-    
+            handler #(zea/response (zea/ear (:handler conf) app) %)]
+        {:stop (run-server handler conf)}))
+
     (stop [e]
       (let [f (zea/state e app :stop)]
         (f :timeout 1000))

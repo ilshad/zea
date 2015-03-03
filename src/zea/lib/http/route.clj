@@ -60,10 +60,10 @@
   "URL Routing component for Zea.
 
    Example of route map:
-   {\"/doc/:id\" {:get [:get-doc] :post [:post-doc]}}
-   where :id is route param and it will be merged into :params map
-   in request. [:get-doc] and [:post-doc] is app paths to the
-   components.
+   {'/doc/:id' {:get [:doc :view] :post [:doc :update]}}
+   where :id is a route param and it will be merged into :params map
+   in the request. [:doc :view] and [:doc :update] is the app paths
+   to the components.
 
    Config:
      * :map - route-map: {string-pattern -> {request-method -> app-path}}
@@ -76,7 +76,7 @@
     
     zea/IConfig
     (config [_]
-      {:map {"/" {:get [:http :hello]}}})
+      {:map {"/" {:get [:http :index]}}})
     
     zea/IState
     (start [e]
