@@ -1,6 +1,6 @@
 # Zea
 
-This work is in progress.
+This is experiment.
 
 ## License
 
