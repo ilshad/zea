@@ -32,3 +32,7 @@
 (defn restart [path app]
   (let [e (ear path app)]
     (swap! app assoc-in (cons :cfg path) (config e))))
+
+(def unit?
+  (some-fn (partial satisfies? IConfig)
+           (partial satisfies? IState)))
